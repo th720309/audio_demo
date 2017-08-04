@@ -11,7 +11,9 @@ var $cancel = $('#cancel');
 var startTime = null;
 var encodingProcess = 'direct',
     encoder = undefined;
-
+ //兼容
+window.URL = window.URL || window.webkitURL;
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var audioContext = new AudioContext;
 if (audioContext.createScriptProcessor == null)
     audioContext.createScriptProcessor = audioContext.createJavaScriptNode;
