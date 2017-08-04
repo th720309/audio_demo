@@ -11,8 +11,10 @@ var $cancel = $('#cancel');
 var startTime = null;
 var encodingProcess = 'direct',
     encoder = undefined;
-
-var audioContext = new AudioContext;
+//兼容
+window.URL = window.URL || window.webkitURL;
+navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia || navigator.mediaDevices.msGetUserMedia;
+var audioContext = new (window.AudioContext || window.webkitAudioContext)();
 if (audioContext.createScriptProcessor == null)
     audioContext.createScriptProcessor = audioContext.createJavaScriptNode;
 var processor = undefined;
@@ -30,14 +32,19 @@ var microphoneLevel = audioContext.createGain();
  * 获取麦克风设备
  * */
 
-function openMicrophone (open) {
-    navigator.mediaDevices.getUserMedia({ audio: open,})
-        .then(function(mediaStream) {
-            microphone = audioContext.createMediaStreamSource(mediaStream);
-            microphone.connect(microphoneLevel);
-        })
-        .catch(function(error) {
-        })
+function openMicrophone () {
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({audio: open,})
+            .then(function (mediaStream) {
+                microphone = audioContext.createMediaStreamSource(mediaStream);
+                microphone.connect(microphoneLevel);
+            })
+            .catch(function (error) {
+                console.log('no microphone input device');
+            })
+    } else {
+        console.log('getUserMedia not support on your browser!');
+    }
 }
 
 
@@ -89,13 +96,11 @@ function startRecordingProcess() {
     processor = audioContext.createScriptProcessor(bufSz, 2, 2);
     input.connect(processor);
     processor.connect(audioContext.destination);
-    console.log('3');
     if (encodingProcess === 'direct') {
         encoder = new Mp3LameEncoder(audioContext.sampleRate, bitRate);
         processor.onaudioprocess = function(event) {
             encoder.encode(getBuffers(event));
         };
-        console.log('1');
     }
 }
 
@@ -107,7 +112,6 @@ function stopRecordingProcess(finish) {
     processor.disconnect();
     if (encodingProcess === 'direct') {
         if (finish) {
-            console.log('2');
             saveRecording(encoder.finish());
         }
         else {
@@ -142,15 +146,12 @@ function startRecording() {
 * 点击record事件
 * */
 $record.click(function() {
-    if (startTime != null){
+    if (startTime != null) {
         stopRecording(true);
-        openMicrophone(false);
-        console.log('yes');
     }
     else {
-        openMicrophone(true);
+        openMicrophone();
         startRecording();
-        console.log('no');
     }
 
 });
