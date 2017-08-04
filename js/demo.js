@@ -30,14 +30,22 @@ var microphoneLevel = audioContext.createGain();
  * 获取麦克风设备
  * */
 
-function openMicrophone (open) {
-    navigator.mediaDevices.getUserMedia({ audio: open,})
+function openMicrophone () {
+    navigator.getUserMedia({ audio: true },
+        function(stream) {
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(microphoneLevel);
+        },
+        function(error) {
+            window.alert("Could not get audio input.");
+        });
+/*    navigator.mediaDevices.getUserMedia({ audio: open,})
         .then(function(mediaStream) {
             microphone = audioContext.createMediaStreamSource(mediaStream);
             microphone.connect(microphoneLevel);
         })
         .catch(function(error) {
-        })
+        })*/
 }
 
 
@@ -144,11 +152,10 @@ function startRecording() {
 $record.click(function() {
     if (startTime != null){
         stopRecording(true);
-        openMicrophone(false);
         console.log('yes');
     }
     else {
-        openMicrophone(true);
+        openMicrophone();
         startRecording();
         console.log('no');
     }
