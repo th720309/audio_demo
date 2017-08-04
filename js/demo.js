@@ -11,10 +11,17 @@ var $cancel = $('#cancel');
 var startTime = null;
 var encodingProcess = 'direct',
     encoder = undefined;
+<<<<<<< HEAD
 //兼容
 window.URL = window.URL || window.webkitURL;
 navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia || navigator.mediaDevices.msGetUserMedia;
 var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+=======
+ //兼容
+window.URL = window.URL || window.webkitURL;
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+var audioContext = new AudioContext;
+>>>>>>> 8ec703cd0d9cb8bd0bef92ca5eca00e27dd9beef
 if (audioContext.createScriptProcessor == null)
     audioContext.createScriptProcessor = audioContext.createJavaScriptNode;
 var processor = undefined;
@@ -33,6 +40,7 @@ var microphoneLevel = audioContext.createGain();
  * */
 
 function openMicrophone () {
+<<<<<<< HEAD
     if (navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({audio: open,})
             .then(function (mediaStream) {
@@ -45,6 +53,23 @@ function openMicrophone () {
     } else {
         console.log('getUserMedia not support on your browser!');
     }
+=======
+    navigator.getUserMedia({ audio: true },
+        function(stream) {
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(microphoneLevel);
+        },
+        function(error) {
+            window.alert("Could not get audio input.");
+        });
+/*    navigator.mediaDevices.getUserMedia({ audio: open,})
+        .then(function(mediaStream) {
+            microphone = audioContext.createMediaStreamSource(mediaStream);
+            microphone.connect(microphoneLevel);
+        })
+        .catch(function(error) {
+        })*/
+>>>>>>> 8ec703cd0d9cb8bd0bef92ca5eca00e27dd9beef
 }
 
 
@@ -148,6 +173,10 @@ function startRecording() {
 $record.click(function() {
     if (startTime != null) {
         stopRecording(true);
+<<<<<<< HEAD
+=======
+        console.log('yes');
+>>>>>>> 8ec703cd0d9cb8bd0bef92ca5eca00e27dd9beef
     }
     else {
         openMicrophone();
